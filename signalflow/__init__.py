@@ -20,7 +20,7 @@ class Pipe(object):
 
 class Signal(object):
     def __repr__(self):
-        return f"Signal({self.signal_name}) from {self.sender}"
+        return "Signal(%s) from %s" % (self.signal_name, self.sender)
 
     def __init__(self, signal_name: str, sender: Pipe,
                  receivers: typing.Tuple[callable], signal_args, signal_kwargs):
@@ -29,7 +29,7 @@ class Signal(object):
         self.signal_kwargs = signal_kwargs
         self.signal_name = signal_name
         self.sender = sender
-        self.logger = logging.getLogger(f"Signal(f{self.signal_name}, f{sender})")
+        self.logger = logging.getLogger("Signal(%s, %s)" % (self.signal_name, sender))
 
     def call(self):
         for receiver in self.receivers:
@@ -72,14 +72,14 @@ class Plumber(object):
         for k, v in inspect.getmembers(pipe, predicate=inspect.ismethod):
             if k.startswith('emit_'):
                 name = k[len('emit_'):]
-                self.logger.info(f"{pipe} emits {name}")
+                self.logger.info("%s emits %s" % (pipe, name))
                 emitter_func = partial(self._emitter_stub, name, pipe)
                 setattr(pipe, k, emitter_func)
                 self._add_emitter(name, emitter_func)
         for k, v in inspect.getmembers(pipe, predicate=inspect.ismethod):
             if k.startswith('receive_'):
                 name = k[len('receive_'):]
-                self.logger.info(f"{pipe} receives {name}")
+                self.logger.info("%s receives %s" % (pipe, name))
                 self._add_receiver(name, v)
 
     def go(self):
@@ -106,5 +106,5 @@ class Plumber(object):
         return self.joints[name]
 
     def _enqueue(self, signal: Signal):
-        self.logger.debug(f"Enqueue {signal}")
+        self.logger.debug("Enqueue %s" % signal)
         self.queue.append(signal)
