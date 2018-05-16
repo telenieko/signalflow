@@ -1,11 +1,8 @@
-import copy
 import inspect
 import typing
 import logging
 from collections import deque
 from functools import partial
-from inspect import getmembers
-from queue import Queue
 
 
 class Pipe(object):
